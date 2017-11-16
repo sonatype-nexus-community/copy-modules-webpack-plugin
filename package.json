@@ -16,7 +16,7 @@
     "javascript"
   ],
   "author": "Ross Pokorny",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/sonatype-nexus-community/copy-modules-webpack-plugin/issues"
   },
