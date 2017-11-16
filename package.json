@@ -15,6 +15,9 @@
     "sonatype",
     "javascript"
   ],
+  "files": [
+    "index.js"
+  ],
   "author": "Ross Pokorny",
   "license": "Apache-2.0",
   "bugs": {
