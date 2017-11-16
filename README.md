@@ -19,7 +19,7 @@
 * [Introduction](#introduction)
 * [Intallation](#installation)
 * [Usage](#usage)
-    * [Configuration](#configuration)
+  * [Configuration](#configuration)
 * [The Fine Print](#the-fine-print)
 * [Getting help](#getting-help)
 
