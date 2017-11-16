@@ -27,7 +27,7 @@ const path = require('path');
 module.exports = class WebpackCopyModulesPlugin {
   constructor(options) {
     // this.destination is the absolute path to the destination folder
-    this.destination = path.join(process.cwd(), options.destination);
+    this.destination = path.resolve(process.cwd(), options.destination);
   }
 
   apply(compiler) {

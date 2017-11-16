@@ -60,7 +60,6 @@ module.exports = {
   <dt>destination</dt>
   <dd>
     The destination directory where the modules will be copied.
-    Relative to webpack's current working directory.
   </dd>
 </dl>
 
