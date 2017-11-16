@@ -1,2 +1,2 @@
 require('foo-pkg/foo');
-module.exports = require('subfolder/a.js');
+module.exports = require('./subfolder/a.js');
