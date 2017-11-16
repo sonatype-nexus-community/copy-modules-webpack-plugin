@@ -1,0 +1,27 @@
+{
+  "name": "copy-modules-webpack-plugin",
+  "version": "0.1.0",
+  "description": "A webpack plugin that copies the original sources of all bundled files to a specified directory so that they might be analyzed by separate tools",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonatype-nexus-community/copy-modules-webpack-plugin.git"
+  },
+  "keywords": [
+    "webpack-plugin",
+    "sonatype",
+    "javascript"
+  ],
+  "author": "Ross Pokorny",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sonatype-nexus-community/copy-modules-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/sonatype-nexus-community/copy-modules-webpack-plugin#readme",
+  "dependencies": {
+    "fs-extra": "^4.0.2"
+  }
+}
