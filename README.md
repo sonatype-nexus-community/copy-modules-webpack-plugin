@@ -17,7 +17,7 @@
 
 # Table Of Contents
 * [Introduction](#introduction)
-* [Intallation](#installation)
+* [Installation](#installation)
 * [Usage](#usage)
   * [Configuration](#configuration)
 * [The Fine Print](#the-fine-print)
