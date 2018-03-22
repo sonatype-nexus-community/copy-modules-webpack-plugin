@@ -29,6 +29,6 @@
   },
   "devDependencies": {
     "node-dir": "=0.1.17",
-    "webpack": "=3.8.1"
+    "webpack": "^4.2.0"
   }
 }

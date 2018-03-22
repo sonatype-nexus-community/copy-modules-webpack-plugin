@@ -40,9 +40,9 @@ module.exports = class WebpackCopyModulesPlugin {
 
   saveModule(module) {
     const me = this,
-        fileDependencies = module.fileDependencies || [];
+        fileDependencies = module.fileDependencies || new Set();
 
-    return Promise.all(fileDependencies.map(function(file) {
+    return Promise.all([...fileDependencies].map(function(file) {
       const relativePath = path.relative('', file),
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
