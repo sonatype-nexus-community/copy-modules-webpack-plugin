@@ -29,6 +29,8 @@
 bundle(s) to a separate directory. This enables external tools such as Sonatype Nexus Lifecycle to analyze only those
 source files which will be included in the final bundle.
 
+### N.B. Since version 2.0 the plugin is only compatible with webpack 4.0 and later. Use 1.x releases for webpack 3.
+
 ## Installation
 
 ```
