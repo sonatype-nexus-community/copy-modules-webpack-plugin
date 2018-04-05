@@ -1,6 +1,6 @@
 {
   "name": "copy-modules-webpack-plugin",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "A webpack plugin that copies the original sources of all bundled files to a specified directory so that they might be analyzed by separate tools",
   "main": "index.js",
   "scripts": {
