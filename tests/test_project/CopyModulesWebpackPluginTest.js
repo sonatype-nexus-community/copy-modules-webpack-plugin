@@ -17,7 +17,7 @@ const webpack = require('webpack');
 const dir = require('node-dir');
 const fs = require('fs-extra');
 const path = require('path');
-const CopyModulesPlugin = require('../index.js');
+const CopyModulesPlugin = require('../../index.js');
 
 const destinationPath = path.resolve(__dirname, path.join('test_output', 'copied_modules'));
 
@@ -43,7 +43,8 @@ const pathsThatShouldBeCopied = [
   'mock_src/e.js',
   'mock_src/subfolder/a.js',
   'node_modules/foo-pkg/foo.js',
-  'node_modules/bar-pkg/bar.js'
+  'node_modules/bar-pkg/bar.js',
+  '__..__/node_modules/outside-cwd-pkg/outside-cwd.js'
 ];
 
 // ensure that the test is running from this directory, as a real invocation of webpack would
