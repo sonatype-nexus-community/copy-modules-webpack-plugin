@@ -21,7 +21,8 @@ const path = require('path');
  * A Webpack plugin that copies the raw source of all imported modules to a separate directory, enabling
  * external analysis of _just_ the files that get included in the bundles.  Within the destination folder,
  * modules are laid out in a subdirectory structure matching the original files' relative location to the
- * directory in which webpack runs.
+ * directory in which webpack runs.  Note that any source files whose relative path is outside of the current directory
+ * will have the `..` parts of its path replaced with `__..__` when copied into the destination tree.
  */
 /* global Promise */
 module.exports = class WebpackCopyModulesPlugin {
@@ -43,7 +44,7 @@ module.exports = class WebpackCopyModulesPlugin {
         fileDependencies = module.buildInfo.fileDependencies || new Set();
 
     return Promise.all([...fileDependencies].map(function(file) {
-      const relativePath = path.relative('', file),
+      const relativePath = replaceParentDirReferences(path.relative('', file)),
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
 
@@ -51,3 +52,12 @@ module.exports = class WebpackCopyModulesPlugin {
     }));
   }
 };
+
+/**
+ * Go through the path and replace all `..` parts with `__..__`
+ */
+function replaceParentDirReferences(inputPath) {
+  const pathParts = inputPath.split(path.sep);
+
+  return pathParts.map(part => part === '..' ? '__..__' : part).join(path.sep);
+}
