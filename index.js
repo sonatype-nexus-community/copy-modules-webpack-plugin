@@ -32,7 +32,7 @@ module.exports = class WebpackCopyModulesPlugin {
   }
 
   apply(compiler) {
-    compiler.plugin('emit', this.handleEmit.bind(this));
+    compiler.hooks.emit.tapAsync('WebpackCopyModulesPlugin', this.handleEmit.bind(this));
   }
 
   handleEmit(compilation, callback) {
