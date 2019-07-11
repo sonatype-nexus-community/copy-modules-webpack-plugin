@@ -32,11 +32,11 @@ module.exports = class WebpackCopyModulesPlugin {
   }
 
   apply(compiler) {
-    compiler.hooks.emit.tapAsync('WebpackCopyModulesPlugin', this.handleEmit.bind(this));
+    compiler.hooks.emit.tapPromise('WebpackCopyModulesPlugin', this.handleEmit.bind(this));
   }
 
-  handleEmit(compilation, callback) {
-    Promise.all(compilation.modules.map(this.saveModule.bind(this))).then(() => callback()).catch(callback);
+  handleEmit(compilation) {
+    return Promise.all(compilation.modules.map(this.saveModule.bind(this)));
   }
 
   saveModule(module) {
