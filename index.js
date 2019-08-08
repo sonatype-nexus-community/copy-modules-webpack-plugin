@@ -40,7 +40,7 @@ module.exports = class WebpackCopyModulesPlugin {
           fileDependencies = new Set();
 
     compilation.modules.forEach(module => (module.buildInfo.fileDependencies ||[])
-	    .forEach(fileDependencies.add.bind(fileDependencies) ));
+	    .forEach(fileDependencies.add.bind(fileDependencies)));
 
     return Promise.all([...fileDependencies].map(function(file) {
       const relativePath = replaceParentDirReferences(path.relative('', file)),
