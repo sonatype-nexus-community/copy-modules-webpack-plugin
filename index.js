@@ -36,12 +36,11 @@ module.exports = class WebpackCopyModulesPlugin {
   }
 
   handleEmit(compilation) {
-    return Promise.all(compilation.modules.map(this.saveModule.bind(this)));
-  }
-
-  saveModule(module) {
     const me = this,
-        fileDependencies = module.buildInfo.fileDependencies || new Set();
+        fileDependencies = new Set();
+
+    compilation.modules.forEach(module => (module.buildInfo.fileDependencies ||[])
+        .forEach(fileDependencies.add.bind(fileDependencies)));
 
     return Promise.all([...fileDependencies].map(function(file) {
       const relativePath = replaceParentDirReferences(path.relative('', file)),
