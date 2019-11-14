@@ -29,6 +29,7 @@ module.exports = class WebpackCopyModulesPlugin {
   constructor(options) {
     // this.destination is the absolute path to the destination folder
     this.destination = path.resolve(process.cwd(), options.destination);
+    this.includePackageJsons = options.includePackageJsons;
   }
 
   apply(compiler) {
@@ -42,8 +43,42 @@ module.exports = class WebpackCopyModulesPlugin {
   saveModule(module) {
     const me = this,
         fileDependencies = module.fileDependencies || [];
+        packageJsons = new Set(),
 
-    return Promise.all(fileDependencies.map(function(file) {
+        // dirs where we checked for a package.json and didn't find one,
+        // tracked as an optimization so we don't repeatedly query the fs looking for the
+        // same non-existent files
+        dirsWithoutPackageJson = new Set();
+
+    // find associated package.json files for each fileDependency
+    fileDependencies.forEach(function(file) {
+      let dirPath = path.dirname(file),
+          oldDirPath;
+
+      // until we reach the root
+      while (dirPath !== oldDirPath) {
+        if (!dirsWithoutPackageJson.has(dirPath)) {
+          const packageJsonPath = path.join(dirPath, 'package.json');
+
+          if (packageJsons.has(packageJsonPath)) {
+            // don't bother with fs lookup if we've already got it
+            return;
+          }
+          else if (fs.pathExistsSync(packageJsonPath)) {
+            packageJsons.add(packageJsonPath);
+            return;
+          }
+        }
+
+        dirsWithoutPackageJson.add(dirPath);
+
+        // loop again to check next parent dir
+        oldDirPath = dirPath;
+        dirPath = path.dirname(dirPath);
+      }
+    });
+
+    return Promise.all([...fileDependencies, ...packageJsons].map(function(file) {
       const relativePath = replaceParentDirReferences(path.relative(process.cwd(), file)),
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
