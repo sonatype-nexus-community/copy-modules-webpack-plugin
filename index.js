@@ -45,10 +45,9 @@ module.exports = class WebpackCopyModulesPlugin {
         fileDependencies = module.fileDependencies || [];
         packageJsons = new Set(),
 
-        // dirs where we checked for a package.json and didn't find one,
-        // tracked as an optimization so we don't repeatedly query the fs looking for the
-        // same non-existent files
-        dirsWithoutPackageJson = new Set();
+        // dirs for which a package.json search has already been conducted.
+        // If the package.json search algo ends up in one of these dirs it knows it can stop searching
+        dirsAlreadySearchedForPackageJson = new Set();
 
     // find associated package.json files for each fileDependency
     fileDependencies.forEach(function(file) {
@@ -57,24 +56,24 @@ module.exports = class WebpackCopyModulesPlugin {
 
       // until we reach the root
       while (dirPath !== oldDirPath) {
-        if (!dirsWithoutPackageJson.has(dirPath)) {
+        if (dirsAlreadySearchedForPackageJson.has(dirPath)) {
+          return;
+        }
+        else {
+          dirsAlreadySearchedForPackageJson.add(dirPath);
+
           const packageJsonPath = path.join(dirPath, 'package.json');
 
-          if (packageJsons.has(packageJsonPath)) {
-            // don't bother with fs lookup if we've already got it
-            return;
-          }
-          else if (fs.pathExistsSync(packageJsonPath)) {
+          if (fs.pathExistsSync(packageJsonPath)) {
             packageJsons.add(packageJsonPath);
             return;
           }
+          else {
+            // loop again to check next parent dir
+            oldDirPath = dirPath;
+            dirPath = path.dirname(dirPath);
+          }
         }
-
-        dirsWithoutPackageJson.add(dirPath);
-
-        // loop again to check next parent dir
-        oldDirPath = dirPath;
-        dirPath = path.dirname(dirPath);
       }
     });
 
