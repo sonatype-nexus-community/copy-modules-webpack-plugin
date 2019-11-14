@@ -29,7 +29,7 @@ module.exports = class WebpackCopyModulesPlugin {
   constructor(options) {
     // this.destination is the absolute path to the destination folder
     this.destination = path.resolve(process.cwd(), options.destination);
-    this.includePackageJsons = options.includePackageJsons;
+    this.includePackageJsons = !!options.includePackageJsons;
   }
 
   apply(compiler) {
@@ -43,14 +43,27 @@ module.exports = class WebpackCopyModulesPlugin {
   saveModule(module) {
     const me = this,
         fileDependencies = module.fileDependencies || [];
-        packageJsons = new Set(),
+
+    const packageJsons = this.includePackageJsons ? this.findPackageJsonPaths(fileDependencies) : [];
+
+    return Promise.all([...fileDependencies, ...packageJsons].map(function(file) {
+      const relativePath = replaceParentDirReferences(path.relative('', file)),
+          destPath = path.join(me.destination, relativePath),
+          destDir = path.dirname(destPath);
+
+      return fs.mkdirs(destDir).then(() => fs.copy(file, destPath, { overwrite: false }));
+    }));
+  }
+
+  findPackageJsonPaths(filePaths) {
+    const packageJsons = new Set(),
 
         // dirs for which a package.json search has already been conducted.
         // If the package.json search algo ends up in one of these dirs it knows it can stop searching
         dirsAlreadySearchedForPackageJson = new Set();
 
     // find associated package.json files for each fileDependency
-    fileDependencies.forEach(function(file) {
+    filePaths.forEach(function(file) {
       let dirPath = path.dirname(file),
           oldDirPath;
 
@@ -77,13 +90,7 @@ module.exports = class WebpackCopyModulesPlugin {
       }
     });
 
-    return Promise.all([...fileDependencies, ...packageJsons].map(function(file) {
-      const relativePath = replaceParentDirReferences(path.relative(process.cwd(), file)),
-          destPath = path.join(me.destination, relativePath),
-          destDir = path.dirname(destPath);
-
-      return fs.mkdirs(destDir).then(() => fs.copy(file, destPath, { overwrite: false }));
-    }));
+    return packageJsons;
   }
 };
 
