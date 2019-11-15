@@ -111,7 +111,7 @@ describe('copy-modules-webpack-plugin', function() {
       }
   );
 
-  it('does not copy package.json files when includePackageJsons is true', function(done) {
+  it('does not copy package.json files when includePackageJsons is false', function(done) {
     const pathsThatShouldBeCopied = [
           'mock_src/b.js',
           'mock_src/e.js',
