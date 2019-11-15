@@ -44,7 +44,7 @@ module.exports = class WebpackCopyModulesPlugin {
         fileDependencies = module.fileDependencies || [];
 
     return Promise.all(fileDependencies.map(function(file) {
-      const relativePath = replaceParentDirReferences(path.relative('', file)),
+      const relativePath = replaceParentDirReferences(path.relative(process.cwd(), file)),
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
 
