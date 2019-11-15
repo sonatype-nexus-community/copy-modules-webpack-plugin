@@ -4,7 +4,7 @@
   "description": "A webpack plugin that copies the original sources of all bundled files to a specified directory so that they might be analyzed by separate tools",
   "main": "index.js",
   "scripts": {
-    "test": "node ./tests/test_project/CopyModulesWebpackPluginTest.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,9 @@
     "fs-extra": "=4.0.2"
   },
   "devDependencies": {
+    "jest": "24.9.0",
     "node-dir": "=0.1.17",
+    "tmp": "0.1.0",
     "webpack": "=3.8.1"
   }
 }
