@@ -21,7 +21,8 @@ const tmp = require('tmp');
 const CopyModulesPlugin = require('../../index.js');
 
 describe('copy-modules-webpack-plugin', function() {
-  let outputDir;
+  let outputDirs,
+      tmpDirs;
 
   beforeEach(function() {
     // ensure that the test is running from this directory, as a real invocation of webpack would
@@ -29,18 +30,21 @@ describe('copy-modules-webpack-plugin', function() {
     process.chdir(__dirname);
 
     outputDir = tmp.dirSync();
+    tmpDirs = [outputDir];
   });
 
   afterEach(function() {
     // NOTE: even though the tmp lib is supposed to delete its directories on exit, that doesn't seem to be working,
     // possibly due to jest's mocking of process exit
-    fs.removeSync(outputDir.name);
+    tmpDirs.forEach(dir => fs.removeSync(dir.name));
   });
 
-  function testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done) {
+  function testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done, webpackContext) {
     const pluginDestination = path.join(outputDir.name, 'copied_modules'),
         webpackConfig = {
-          context: path.resolve(__dirname, 'mock_src'),
+          // disable things like the terser plugin that complicate test setup
+          mode: 'development',
+          context: webpackContext || path.resolve(__dirname, 'mock_src'),
           entry: './b.js',
           output: {
             path: outputDir.name,
@@ -85,5 +89,76 @@ describe('copy-modules-webpack-plugin', function() {
         pluginConfig = {};
 
     testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done);
+  });
+
+  it('copies relevant package.json files in addition to javascript files when includePackageJsons is true',
+      function(done) {
+        const pathsThatShouldBeCopied = [
+              'mock_src/b.js',
+              'mock_src/e.js',
+              'mock_src/subfolder/a.js',
+              'package.json',
+              'node_modules/foo-pkg/foo.js',
+              'node_modules/foo-pkg/package.json',
+              'node_modules/bar-pkg/bar.js',
+              'node_modules/bar-pkg/package.json',
+              '__..__/node_modules/outside-cwd-pkg/outside-cwd.js',
+              '__..__/node_modules/outside-cwd-pkg/package.json'
+            ],
+            pluginConfig = { includePackageJsons: true };
+
+        testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done);
+      }
+  );
+
+  it('does not copy package.json files when includePackageJsons is true', function(done) {
+    const pathsThatShouldBeCopied = [
+          'mock_src/b.js',
+          'mock_src/e.js',
+          'mock_src/subfolder/a.js',
+          'node_modules/foo-pkg/foo.js',
+          'node_modules/bar-pkg/bar.js',
+          '__..__/node_modules/outside-cwd-pkg/outside-cwd.js'
+        ],
+        pluginConfig = { includePackageJsons: false };
+
+    testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done);
+  });
+
+  it('handles files that have no parent package.json', function(done) {
+    const tmpDir = tmp.dirSync(),
+        tmpDirName = tmpDir.name;
+
+    tmpDirs.push(tmpDir);
+
+    // copy the js files but not the package.json files to a temp dir where (hopefully) there isn't a package.json
+    // anywhere higher in the directory tree
+    [
+      'mock_src/b.js',
+      'mock_src/e.js',
+      'mock_src/subfolder/a.js',
+      'node_modules/foo-pkg/foo.js',
+      'node_modules/bar-pkg/bar.js',
+      '../node_modules/outside-cwd-pkg/outside-cwd.js'
+    ].forEach(function(file) {
+      const dest = path.join(tmpDirName, file);
+
+      fs.ensureDirSync(path.dirname(dest));
+      fs.copyFileSync(path.resolve(__dirname, file), path.join(tmpDirName, file));
+    });
+
+    process.chdir(tmpDirName);
+
+    const pathsThatShouldBeCopied = [
+          'mock_src/b.js',
+          'mock_src/e.js',
+          'mock_src/subfolder/a.js',
+          'node_modules/foo-pkg/foo.js',
+          'node_modules/bar-pkg/bar.js',
+          '__..__/node_modules/outside-cwd-pkg/outside-cwd.js'
+        ],
+        pluginConfig = { includePackageJsons: true };
+
+    testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done, path.resolve(tmpDir.name, 'mock_src'));
   });
 });
