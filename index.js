@@ -46,7 +46,7 @@ module.exports = class WebpackCopyModulesPlugin {
     const packageJsons = this.includePackageJsons ? this.findPackageJsonPaths(fileDependencies) : [];
 
     return Promise.all([...fileDependencies, ...packageJsons].map(function(file) {
-      const relativePath = replaceParentDirReferences(path.relative('', file)),
+      const relativePath = replaceParentDirReferences(path.relative(process.cwd(), file)),
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
 
