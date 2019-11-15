@@ -42,8 +42,6 @@ describe('copy-modules-webpack-plugin', function() {
   function testPluginConfig(pluginConfig, pathsThatShouldBeCopied, done, webpackContext) {
     const pluginDestination = path.join(outputDir.name, 'copied_modules'),
         webpackConfig = {
-          // disable things like the terser plugin that complicate test setup
-          mode: 'development',
           context: webpackContext || path.resolve(__dirname, 'mock_src'),
           entry: './b.js',
           output: {
