@@ -54,12 +54,18 @@ module.exports = {
 
 ### Configuration
 
-`copy-modules-webpack-plugin` currently supports a single configuration option:
+`copy-modules-webpack-plugin` currently supports the following configuration options:
 
 <dl>
   <dt>destination</dt>
   <dd>
     The destination directory where the modules will be copied.
+  </dd>
+  <dt>includePackageJsons</dt>
+  <dd>
+    Set this to true to also copy the package.json file associated with each copied module file. This may
+    be useful if you are analyzing the output with a tool that has need for additional metadata about each
+    module (Default: false)
   </dd>
 </dl>
 

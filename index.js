@@ -29,6 +29,7 @@ module.exports = class WebpackCopyModulesPlugin {
   constructor(options) {
     // this.destination is the absolute path to the destination folder
     this.destination = path.resolve(process.cwd(), options.destination);
+    this.includePackageJsons = !!options.includePackageJsons;
   }
 
   apply(compiler) {
@@ -43,13 +44,53 @@ module.exports = class WebpackCopyModulesPlugin {
     const me = this,
         fileDependencies = module.fileDependencies || [];
 
-    return Promise.all(fileDependencies.map(function(file) {
+    const packageJsons = this.includePackageJsons ? this.findPackageJsonPaths(fileDependencies) : [];
+
+    return Promise.all([...fileDependencies, ...packageJsons].map(function(file) {
       const relativePath = replaceParentDirReferences(path.relative(process.cwd(), file)),
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
 
       return fs.mkdirs(destDir).then(() => fs.copy(file, destPath, { overwrite: false }));
     }));
+  }
+
+  findPackageJsonPaths(filePaths) {
+    const packageJsons = new Set(),
+
+        // dirs for which a package.json search has already been conducted.
+        // If the package.json search algo ends up in one of these dirs it knows it can stop searching
+        dirsAlreadySearchedForPackageJson = new Set();
+
+    // find associated package.json files for each fileDependency
+    filePaths.forEach(function(file) {
+      let dirPath = path.dirname(file),
+          oldDirPath;
+
+      // until we reach the root
+      while (dirPath !== oldDirPath) {
+        if (dirsAlreadySearchedForPackageJson.has(dirPath)) {
+          return;
+        }
+        else {
+          dirsAlreadySearchedForPackageJson.add(dirPath);
+
+          const packageJsonPath = path.join(dirPath, 'package.json');
+
+          if (fs.pathExistsSync(packageJsonPath)) {
+            packageJsons.add(packageJsonPath);
+            return;
+          }
+          else {
+            // loop again to check next parent dir
+            oldDirPath = dirPath;
+            dirPath = path.dirname(dirPath);
+          }
+        }
+      }
+    });
+
+    return packageJsons;
   }
 };
 
