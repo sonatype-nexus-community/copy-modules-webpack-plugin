@@ -50,7 +50,11 @@ module.exports = class WebpackCopyModulesPlugin {
           destPath = path.join(me.destination, relativePath),
           destDir = path.dirname(destPath);
 
-      return fs.mkdirs(destDir).then(() => fs.copy(file, destPath, { overwrite: false }));
+      return fs.pathExists(file)
+          .then(exists => exists ?
+            fs.mkdirs(destDir).then(() => fs.copy(file, destPath, { overwrite: false })) :
+            Promise.resolve()
+          );
     }));
   }
 
