@@ -28,7 +28,7 @@
     "fs-extra": "=8.1.0"
   },
   "devDependencies": {
-    "jest": "24.9.0",
+    "jest": "25.1.0",
     "node-dir": "=0.1.17",
     "tmp": "0.1.0",
     "webpack": "=4.35.3"
