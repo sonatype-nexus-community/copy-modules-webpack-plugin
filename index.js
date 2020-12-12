@@ -40,8 +40,15 @@ module.exports = class WebpackCopyModulesPlugin {
     const me = this,
         fileDependencies = new Set();
 
-    compilation.modules.forEach(module => (module.buildInfo.fileDependencies ||[])
-        .forEach(fileDependencies.add.bind(fileDependencies)));
+    compilation.modules.forEach(module => {
+      if (typeof module === 'object' && module !== null &&
+        typeof module.buildInfo === 'object' && module.buildInfo !== null &&
+        typeof module.buildInfo.snapshot === 'object' && module.buildInfo.snapshot !== null
+      ) {
+        (module.buildInfo.snapshot.managedFiles ||[])
+          .forEach(fileDependencies.add.bind(fileDependencies));
+      }
+    });
 
     const packageJsons = this.includePackageJsons ? this.findPackageJsonPaths(fileDependencies) : [];
 
