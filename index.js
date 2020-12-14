@@ -36,12 +36,17 @@ module.exports = class WebpackCopyModulesPlugin {
     compiler.hooks.emit.tapPromise('WebpackCopyModulesPlugin', this.handleEmit.bind(this));
   }
 
-  handleEmit(compilation) {
+  async handleEmit(compilation) {
     const me = this,
         fileDependencies = new Set();
 
-    compilation.modules.forEach(module => (module.buildInfo.fileDependencies ||[])
-        .forEach(fileDependencies.add.bind(fileDependencies)));
+    // add all fileDependencies that are actual files (parent directories are included in
+    // compilation.fileDependencies)
+    for (const fileDep of compilation.fileDependencies) {
+      if ((await fs.lstat(fileDep)).isFile()) {
+        fileDependencies.add(fileDep);
+      }
+    }
 
     const packageJsons = this.includePackageJsons ? this.findPackageJsonPaths(fileDependencies) : [];
 
