@@ -32,6 +32,6 @@
     "node-dir": "=0.1.17",
     "tmp": "0.1.0",
     "webpack": "=4.41.5",
-    "webpack5": "npm:webpack@^5.10.1"
+    "webpack5": "npm:webpack@=5.10.1"
   }
 }
