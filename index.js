@@ -33,17 +33,28 @@ module.exports = class WebpackCopyModulesPlugin {
   }
 
   apply(compiler) {
-    compiler.hooks.emit.tapPromise('WebpackCopyModulesPlugin', this.handleEmit.bind(this));
+    // NOTE: this is only available in webpack 5+, but that's the only version we want to check for anyway
+    const webpackVersion = compiler.webpack && compiler.webpack.version;
+
+    compiler.hooks.emit.tapPromise('WebpackCopyModulesPlugin', this.handleEmit.bind(this, webpackVersion));
   }
 
-  handleEmit(compilation) {
+  async handleEmit(webpackVersion, compilation) {
     const me = this,
-        fileDependencies = new Set();
+        fileDependencies = new Set(),
+        isWebpack5Plus = !!webpackVersion && webpackVersion.match(/^(\d+)\./)[1] >= 5;
 
-    compilation.modules.forEach(module => (module.buildInfo.fileDependencies ||[])
-        .forEach(fileDependencies.add.bind(fileDependencies)));
+    // add all fileDependencies that are actual files (parent directories are included in
+    // compilation.fileDependencies)
+    for (const fileDep of compilation.fileDependencies) {
+      if ((await fs.lstat(fileDep)).isFile()) {
+        fileDependencies.add(fileDep);
+      }
+    }
 
-    const packageJsons = this.includePackageJsons ? this.findPackageJsonPaths(fileDependencies) : [];
+    // Webpack 5 already includes the package.json files, so no need for this step there
+    const packageJsons = !isWebpack5Plus && this.includePackageJsons ?
+        this.findPackageJsonPaths(fileDependencies) : [];
 
     return Promise.all([...fileDependencies, ...packageJsons].map(function(file) {
       const relativePath = replaceParentDirReferences(path.relative(process.cwd(), file)),

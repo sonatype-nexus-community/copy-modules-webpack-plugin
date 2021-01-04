@@ -65,9 +65,14 @@ module.exports = {
   </dd>
   <dt>includePackageJsons</dt>
   <dd>
-    Set this to true to also copy the package.json file associated with each copied module file. This may
-    be useful if you are analyzing the output with a tool that has need for additional metadata about each
-    module (Default: false)
+    <p>
+      When using Webpack 4, set this to true to also copy the package.json file associated with each copied module
+      file. This may be useful if you are analyzing the output with a tool that has need for additional metadata about
+      each module (Default: false).
+    </p>
+    <p>
+      Note: when using webpack 5, the package.json files are copied regardless of the value of this flag.
+    </p>
   </dd>
 </dl>
 
