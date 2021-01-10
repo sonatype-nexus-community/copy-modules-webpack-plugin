@@ -47,8 +47,29 @@ module.exports = class WebpackCopyModulesPlugin {
     // add all fileDependencies that are actual files (parent directories are included in
     // compilation.fileDependencies)
     for (const fileDep of compilation.fileDependencies) {
-      if ((await fs.lstat(fileDep)).isFile()) {
-        fileDependencies.add(fileDep);
+      try {
+        if (fs.lstatSync(fileDep).isFile()) {
+          fileDependencies.add(fileDep);
+        }
+      } catch (e) {
+        const depDir = fileDep.replace(/[^\\/]+$/, "");
+        const depFile = fileDep.replace(/[^.]+$/, "");
+
+        let depDirFiles;
+        try {
+          depDirFiles = fs.readdirSync(path.resolve(depDir));
+        } catch (error) {
+          depDirFiles = [];
+        }
+
+        depDirFiles.forEach((depDirFile) => {
+          const depDirFilePath = path.resolve(depDir, depDirFile);
+          if (fs.lstatSync(depDirFilePath).isFile()) {
+            if (depFile === depDirFilePath.replace(/[^.]+$/, "")) {
+              fileDependencies.add(depDirFilePath);
+            }
+          }
+        });
       }
     }
 
