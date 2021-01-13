@@ -47,7 +47,10 @@ module.exports = class WebpackCopyModulesPlugin {
     // add all fileDependencies that are actual files (parent directories are included in
     // compilation.fileDependencies)
     for (const fileDep of compilation.fileDependencies) {
-      if ((await fs.lstat(fileDep)).isFile()) {
+      const exists = await fs.pathExists(fileDep),
+          isFile = exists && (await fs.lstat(fileDep)).isFile();
+
+      if (isFile) {
         fileDependencies.add(fileDep);
       }
     }
