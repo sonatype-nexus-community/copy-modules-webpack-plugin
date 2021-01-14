@@ -25,13 +25,13 @@
   },
   "homepage": "https://github.com/sonatype-nexus-community/copy-modules-webpack-plugin#readme",
   "dependencies": {
-    "fs-extra": "=8.1.0"
+    "fs-extra": "^8.1.0"
   },
   "devDependencies": {
-    "jest": "25.1.0",
-    "node-dir": "=0.1.17",
-    "tmp": "0.1.0",
-    "webpack": "=4.41.5",
-    "webpack5": "npm:webpack@=5.10.1"
+    "jest": "^25.5.4",
+    "node-dir": "^=0.1.17",
+    "tmp": "^0.1.0",
+    "webpack": "^4.46.0",
+    "webpack5": "npm:webpack@^5.14.0"
   }
 }
