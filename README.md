@@ -41,7 +41,7 @@ npm install --save-dev copy-modules-webpack-plugin
 
 Instantiate the plugin with the desired configuration options and include it in the `plugins` array of your webpack configuration:
 
-```
+```js
 const CopyModulesPlugin = require("copy-modules-webpack-plugin");
 
 module.exports = {
